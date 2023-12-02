@@ -84,7 +84,8 @@ func AuthMiddleware(api *data.KeycloakAPI) gin.HandlerFunc {
 func NewHTTPServer(
 	c *conf.Server,
 	bus *route.BusRouter,
-	router *route.RouteRouter,
+	keycloak *data.KeycloakAPI,
+	route *route.RouteRouter,
 	logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
@@ -108,6 +109,12 @@ func NewHTTPServer(
 	config.AllowCredentials = true
 	r.Use(cors.New(config))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	busG := r.Group("/bus")
+	busG.Use(AuthMiddleware(keycloak))
+	bus.Register(busG)
+	routeG := r.Group("/route")
+	routeG.Use(AuthMiddleware(keycloak))
+	route.Register(routeG)
 	srv := http.NewServer(opts...)
 
 	srv.HandlePrefix("/", r)
