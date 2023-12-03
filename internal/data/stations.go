@@ -18,7 +18,7 @@ type Stations struct {
 func (m Stations) modelToResponse() *biz.Stations {
 	routes := make([]biz.Route, 0)
 	for _, route := range m.Routes {
-		routes = append(routes, *route.modelToResponse())
+		routes = append(routes, *route.modelToResponseWithoutStations())
 	}
 	return &biz.Stations{
 		ID:     m.ID,
