@@ -144,13 +144,5 @@ func NewRabbit(c *conf.Data) *biz.RabbitData {
 		false,      // no-wait
 		nil,        // arguments
 	)
-	ch.QueueDeclare(
-		"social", // name
-		false,    // durable
-		false,    // delete when unused
-		false,    // exclusive
-		false,    // no-wait
-		nil,      // arguments
-	)
 	return &biz.RabbitData{Ch: ch, Conn: conn}
 }

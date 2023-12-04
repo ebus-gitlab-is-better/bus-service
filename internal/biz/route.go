@@ -93,9 +93,17 @@ func (uc *RouteUseCase) NewAccident(ctx context.Context, accident *Accident) {
 			return
 		}
 		if req.IsValid {
+			q, _ := uc.rabbit.Ch.QueueDeclare(
+				"social", // name
+				false,    // durable
+				false,    // delete when unused
+				false,    // exclusive
+				false,    // no-wait
+				nil,      // arguments
+			)
 			uc.rabbit.Ch.PublishWithContext(context.TODO(),
 				"",
-				"social",
+				q.Name,
 				false,
 				false,
 				amqp091.Publishing{
