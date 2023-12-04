@@ -4,6 +4,7 @@ import (
 	"bus-service/internal/biz"
 	"bus-service/internal/conf"
 	"context"
+	"crypto/tls"
 	"fmt"
 	slog "log"
 	"os"
@@ -75,6 +76,8 @@ func (d *Data) ExecTx(ctx context.Context, fn func(ctx context.Context) error) e
 
 func NewKeycloak(c *conf.Data) *gocloak.GoCloak {
 	client := gocloak.NewClient(c.Keycloak.Hostname)
+	restyClient := client.RestyClient()
+	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	return client
 }
 
