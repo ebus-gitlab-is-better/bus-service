@@ -42,8 +42,8 @@ type RouteUseCase struct {
 	rabbit    *RabbitData
 }
 
-func NewRouteUseCase(repo RouteRepo, logger log.Logger, mapClient mapS.MapClient) *RouteUseCase {
-	return &RouteUseCase{repo: repo, logger: log.NewHelper(logger), mapClient: mapClient}
+func NewRouteUseCase(repo RouteRepo, logger log.Logger, mapClient mapS.MapClient, rabbit *RabbitData) *RouteUseCase {
+	return &RouteUseCase{repo: repo, logger: log.NewHelper(logger), mapClient: mapClient, rabbit: rabbit}
 }
 
 func (uc *RouteUseCase) Create(ctx context.Context, route *Route) error {
@@ -95,7 +95,7 @@ func (uc *RouteUseCase) NewAccident(ctx context.Context, accident *Accident) {
 		if req.IsValid {
 			uc.rabbit.Ch.PublishWithContext(context.TODO(),
 				"",
-				"accident",
+				"social",
 				false,
 				false,
 				amqp091.Publishing{
