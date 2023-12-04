@@ -2,8 +2,13 @@ package biz
 
 import (
 	"context"
+	"encoding/json"
+	"time"
+
+	mapS "bus-service/api/map/v1"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/rabbitmq/amqp091-go"
 )
 
 type Route struct {
@@ -11,6 +16,15 @@ type Route struct {
 	Number   string
 	Path     string
 	Stations []Stations
+}
+
+type Accident struct {
+	Id        uint64     `json:"id" gorm:"primaryKey"`
+	Name      string     `json:"name"`
+	Lat       float64    `json:"lat"`
+	Lon       float64    `json:"lon"`
+	StartDate time.Time  `json:"start_date"`
+	EndDate   *time.Time `json:"end_date,omitempty"`
 }
 
 type RouteRepo interface {
@@ -22,12 +36,14 @@ type RouteRepo interface {
 }
 
 type RouteUseCase struct {
-	repo   RouteRepo
-	logger *log.Helper
+	repo      RouteRepo
+	mapClient mapS.MapClient
+	logger    *log.Helper
+	rabbit    *RabbitData
 }
 
-func NewRouteUseCase(repo RouteRepo, logger log.Logger) *RouteUseCase {
-	return &RouteUseCase{repo: repo, logger: log.NewHelper(logger)}
+func NewRouteUseCase(repo RouteRepo, logger log.Logger, mapClient mapS.MapClient) *RouteUseCase {
+	return &RouteUseCase{repo: repo, logger: log.NewHelper(logger), mapClient: mapClient}
 }
 
 func (uc *RouteUseCase) Create(ctx context.Context, route *Route) error {
@@ -48,4 +64,45 @@ func (uc *RouteUseCase) GetById(ctx context.Context, id uint32) (*Route, error) 
 
 func (uc *RouteUseCase) List(ctx context.Context) ([]*Route, int64, error) {
 	return uc.repo.List(ctx)
+}
+
+type MessageDTO struct {
+	Message string `json:"message"`
+}
+
+func (uc *RouteUseCase) NewAccident(ctx context.Context, accident *Accident) {
+	routes, _, err := uc.List(context.TODO())
+	if err != nil {
+		return
+	}
+	for _, route := range routes {
+		req, err := uc.mapClient.CheckPath(context.TODO(), &mapS.CheckPathRequest{
+			Shape: route.Path,
+			Point: &mapS.Point{
+				Lat: float32(accident.Lat),
+				Lon: float32(accident.Lon),
+			},
+		})
+		if err != nil {
+			return
+		}
+		jsonData, err := json.Marshal(&MessageDTO{
+			Message: "Обнаружена дтп по маршруту " + route.Number + " извините за ожидание автобуса",
+		})
+		if err != nil {
+			return
+		}
+		if req.IsValid {
+			uc.rabbit.Ch.PublishWithContext(context.TODO(),
+				"",
+				"accident",
+				false,
+				false,
+				amqp091.Publishing{
+					ContentType:  "application/json",
+					Body:         jsonData,
+					DeliveryMode: amqp091.Persistent,
+				})
+		}
+	}
 }

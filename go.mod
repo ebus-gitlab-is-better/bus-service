@@ -5,8 +5,10 @@ go 1.19
 require (
 	github.com/go-kratos/kratos/v2 v2.7.0
 	github.com/google/wire v0.5.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/swaggo/swag v1.16.2
 	go.uber.org/automaxprocs v1.5.1
+	google.golang.org/grpc v1.56.1
 	google.golang.org/protobuf v1.31.0
 )
 
@@ -53,7 +55,6 @@ require (
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/tools v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230629202037-9506855d4529 // indirect
-	google.golang.org/grpc v1.56.1 // indirect
 )
 
 require (

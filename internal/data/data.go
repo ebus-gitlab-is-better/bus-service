@@ -9,9 +9,15 @@ import (
 	"os"
 	"time"
 
+	mapS "bus-service/api/map/v1"
+
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/google/wire"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -26,12 +32,15 @@ var ProviderSet = wire.NewSet(
 	NewBusRepo,
 	NewRouterRepo,
 	NewStationsRepo,
+	NewMapService,
+	NewRabbit,
 )
 
 // Data структура для работы с базой данных
 type Data struct {
 	db       *gorm.DB //Реализация работы с базой данной через библиотеку gorm
 	keycloak *KeycloakAPI
+
 	// node *centrifuge.Node
 }
 
@@ -97,4 +106,48 @@ func NewDB(c *conf.Data) *gorm.DB {
 	}
 	db.AutoMigrate(&Bus{}, &Route{}, &Stations{}, &Shift{})
 	return db
+}
+
+func NewMapService(c *conf.Data) mapS.MapClient {
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint(c.MapService),
+		grpc.WithMiddleware(
+			tracing.Client(),
+			recovery.Recovery()),
+		grpc.WithTimeout(2*time.Second),
+	)
+	if err != nil {
+		panic(err)
+	}
+	return mapS.NewMapClient(conn)
+}
+
+func NewRabbit(c *conf.Data) *biz.RabbitData {
+	conn, err := amqp.Dial(c.Rabbit)
+	if err != nil {
+		panic(err)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		panic(err)
+	}
+	ch.QueueDeclare(
+		"accident", // name
+		false,      // durable
+		false,      // delete when unused
+		false,      // exclusive
+		false,      // no-wait
+		nil,        // arguments
+	)
+	ch.QueueDeclare(
+		"social", // name
+		false,    // durable
+		false,    // delete when unused
+		false,    // exclusive
+		false,    // no-wait
+		nil,      // arguments
+	)
+	return &biz.RabbitData{Ch: ch, Conn: conn}
 }

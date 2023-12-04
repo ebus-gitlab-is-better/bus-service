@@ -36,10 +36,13 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	busUseCase := biz.NewBusUseCase(busRepo, logger)
 	busRouter := route.NewBusRouter(busUseCase)
 	routeRepo := data.NewRouterRepo(dataData, logger)
-	routeUseCase := biz.NewRouteUseCase(routeRepo, logger)
+	mapClient := data.NewMapService(confData)
+	routeUseCase := biz.NewRouteUseCase(routeRepo, logger, mapClient)
 	routeRouter := route.NewRouteRouter(routeUseCase)
 	httpServer := server.NewHTTPServer(confServer, busRouter, keycloakAPI, routeRouter, logger)
-	app := newApp(logger, grpcServer, httpServer)
+	rabbitData := data.NewRabbit(confData)
+	rabbitConn := server.NewRabbitConn(rabbitData, routeUseCase)
+	app := newApp(logger, grpcServer, httpServer, rabbitConn)
 	return app, func() {
 		cleanup()
 	}, nil

@@ -50,4 +50,6 @@ message Data {
   KeyCloak keycloak = 3;
   string api_key = 4;
   string address_message = 5;
+  string rabbit = 6;
+  string map_service = 7;
 }
