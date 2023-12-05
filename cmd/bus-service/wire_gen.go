@@ -40,7 +40,10 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	rabbitData := data.NewRabbit(confData)
 	routeUseCase := biz.NewRouteUseCase(routeRepo, logger, mapClient, rabbitData)
 	routeRouter := route.NewRouteRouter(routeUseCase, mapClient)
-	httpServer := server.NewHTTPServer(confServer, busRouter, keycloakAPI, routeRouter, logger)
+	driverRepo := data.NewDriverRepo(dataData)
+	driverUseCase := biz.NewDriverUseCase(driverRepo)
+	driverRoute := route.NewDriverRoute(driverUseCase)
+	httpServer := server.NewHTTPServer(confServer, busRouter, keycloakAPI, routeRouter, driverRoute, logger)
 	rabbitConn := server.NewRabbitConn(rabbitData, routeUseCase)
 	app := newApp(logger, grpcServer, httpServer, rabbitConn)
 	return app, func() {
