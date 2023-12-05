@@ -9,16 +9,20 @@ import (
 )
 
 type KeycloakAPI struct {
-	conf   *conf.Data
-	client *gocloak.GoCloak
-	logger *log.Helper
+	client       *gocloak.GoCloak
+	logger       *log.Helper
+	clientId     string
+	clientSecret string
+	realm        string
 }
 
 func NewKeyCloakAPI(conf *conf.Data, client *gocloak.GoCloak, logger log.Logger) *KeycloakAPI {
 	return &KeycloakAPI{
-		conf:   conf,
-		client: client,
-		logger: log.NewHelper(logger),
+		client:       client,
+		logger:       log.NewHelper(logger),
+		clientId:     conf.Keycloak.ClientId,
+		clientSecret: conf.Keycloak.ClientSecret,
+		realm:        conf.Keycloak.Realm,
 	}
 }
 
@@ -26,33 +30,40 @@ func (api *KeycloakAPI) CheckToken(accessToken string) (*gocloak.IntroSpectToken
 	return api.client.RetrospectToken(
 		context.TODO(),
 		accessToken,
-		api.conf.Keycloak.ClientId,
-		api.conf.Keycloak.ClientSecret,
-		api.conf.Keycloak.Realm)
+		api.clientId,
+		api.clientSecret,
+		api.realm)
 }
 
 func (api *KeycloakAPI) GetUserInfo(accessToken string) (*gocloak.UserInfo, error) {
 	return api.client.GetUserInfo(
 		context.TODO(),
 		accessToken,
-		api.conf.Keycloak.Realm)
+		api.realm)
 }
 
 func (api *KeycloakAPI) GetUserByID(userId string) (*gocloak.User, error) {
-	token, err := api.client.LoginClient(context.TODO(), api.conf.Keycloak.ClientId, api.conf.Keycloak.ClientSecret, api.conf.Keycloak.Realm)
+	token, err := api.client.LoginClient(context.TODO(),
+		api.clientId,
+		api.clientSecret,
+		api.realm)
 	if err != nil {
 		return nil, err
 	}
 	return api.client.GetUserByID(
 		context.TODO(),
 		token.AccessToken,
-		api.conf.Keycloak.Realm,
+		api.realm,
 		userId,
 	)
 }
 
 func (api *KeycloakAPI) GetDrivers(roleName string) ([]*gocloak.User, error) {
-	token, err := api.client.LoginClient(context.TODO(), api.conf.Keycloak.ClientId, api.conf.Keycloak.ClientSecret, api.conf.Keycloak.Realm)
+	token, err := api.client.LoginClient(
+		context.TODO(),
+		api.clientId,
+		api.clientSecret,
+		api.realm)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +71,7 @@ func (api *KeycloakAPI) GetDrivers(roleName string) ([]*gocloak.User, error) {
 	return api.client.GetUsersByRoleName(
 		context.TODO(),
 		token.AccessToken,
-		api.conf.Keycloak.Realm,
+		api.realm,
 		roleName,
 		gocloak.GetUsersByRoleParams{},
 	)
