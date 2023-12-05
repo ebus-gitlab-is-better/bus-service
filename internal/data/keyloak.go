@@ -3,6 +3,7 @@ package data
 import (
 	"bus-service/internal/conf"
 	"context"
+	"fmt"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/go-kratos/kratos/v2/log"
@@ -59,6 +60,7 @@ func (api *KeycloakAPI) GetUserByID(userId string) (*gocloak.User, error) {
 }
 
 func (api *KeycloakAPI) GetDrivers(roleName string) ([]*gocloak.User, error) {
+	fmt.Println(api.clientId, api.clientSecret, api.realm, api.client)
 	token, err := api.client.LoginClient(
 		context.TODO(),
 		api.clientId,
