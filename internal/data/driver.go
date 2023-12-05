@@ -46,7 +46,7 @@ func (r *driverRepo) GetDrivers(ctx context.Context) ([]*biz.Driver, error) {
 		}
 		if user.Attributes != nil {
 			mapAttributes := *user.Attributes
-			phone, ok := mapAttributes["test"]
+			phone, ok := mapAttributes["phone"]
 			if ok {
 				dto.Phone = &phone[0]
 			}
