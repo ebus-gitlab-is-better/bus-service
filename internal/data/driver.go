@@ -13,8 +13,7 @@ type Driver struct {
 }
 
 type driverRepo struct {
-	data     *Data
-	keycloak *KeycloakAPI
+	data *Data
 }
 
 func NewDriverRepo(data *Data) biz.DriverRepo {
@@ -25,7 +24,7 @@ const driverRole = "driver"
 
 // GetDrivers implements biz.DriverRepo.
 func (r *driverRepo) GetDrivers(ctx context.Context) ([]*biz.Driver, error) {
-	kusers, err := r.keycloak.GetDrivers(driverRole)
+	kusers, err := r.data.keycloak.GetDrivers(driverRole)
 	if err != nil {
 		return nil, err
 	}
