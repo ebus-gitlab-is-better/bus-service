@@ -7,15 +7,18 @@ import (
 	"io"
 	"strconv"
 
+	mapS "bus-service/api/map/v1"
+
 	"github.com/gin-gonic/gin"
 )
 
 type RouteRouter struct {
-	uc *biz.RouteUseCase
+	uc        *biz.RouteUseCase
+	mapClient mapS.MapClient
 }
 
-func NewRouteRouter(uc *biz.RouteUseCase) *RouteRouter {
-	return &RouteRouter{uc: uc}
+func NewRouteRouter(uc *biz.RouteUseCase, mapClient mapS.MapClient) *RouteRouter {
+	return &RouteRouter{uc: uc, mapClient: mapClient}
 }
 
 func (r *RouteRouter) Register(router *gin.RouterGroup) {
@@ -34,8 +37,8 @@ type StationDTO struct {
 }
 
 type RouteDTO struct {
-	Number   string
-	Path     string
+	Number string
+	// Path     string
 	Stations []StationDTO
 }
 
@@ -77,9 +80,25 @@ func (r *RouteRouter) create(c *gin.Context) {
 			Lon:  station.Lon,
 		})
 	}
+	points := make([]*mapS.Point, 0)
+	for _, station := range stations {
+		points = append(points, &mapS.Point{
+			Lat: float32(station.Lat),
+			Lon: float32(station.Lon),
+		})
+	}
+	req, err := r.mapClient.GetPath(context.TODO(), &mapS.GetPathRequest{
+		Points: points,
+	})
+	if err != nil {
+		c.AbortWithStatusJSON(400, &gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	err = r.uc.Create(context.TODO(), &biz.Route{
 		Number:   dto.Number,
-		Path:     dto.Path,
+		Path:     req.Shape,
 		Stations: stations,
 	})
 
@@ -143,10 +162,26 @@ func (r *RouteRouter) update(c *gin.Context) {
 			Lon:  station.Lon,
 		})
 	}
+	points := make([]*mapS.Point, 0)
+	for _, station := range stations {
+		points = append(points, &mapS.Point{
+			Lat: float32(station.Lat),
+			Lon: float32(station.Lon),
+		})
+	}
+	req, err := r.mapClient.GetPath(context.TODO(), &mapS.GetPathRequest{
+		Points: points,
+	})
+	if err != nil {
+		c.AbortWithStatusJSON(400, &gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	err = r.uc.Update(context.TODO(), &biz.Route{
 		Id:       uint32(idUint),
 		Number:   dto.Number,
-		Path:     dto.Path,
+		Path:     req.Shape,
 		Stations: stations,
 	})
 

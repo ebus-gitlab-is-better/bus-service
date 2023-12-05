@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package api.bus.v1;
+
+option go_package = "bus-service/api/bus/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.bus.v1";
+
+service Bus {
+	rpc CreateBus (CreateBusRequest) returns (CreateBusReply);
+	rpc UpdateBus (UpdateBusRequest) returns (UpdateBusReply);
+	rpc DeleteBus (DeleteBusRequest) returns (DeleteBusReply);
+	rpc GetBus (GetBusRequest) returns (GetBusReply);
+	rpc ListBus (ListBusRequest) returns (ListBusReply);
+}
+
+message CreateBusRequest {}
+message CreateBusReply {}
+
+message UpdateBusRequest {}
+message UpdateBusReply {}
+
+message DeleteBusRequest {}
+message DeleteBusReply {}
+
+message GetBusRequest {}
+message GetBusReply {}
+
+message ListBusRequest {}
+message ListBusReply {}
