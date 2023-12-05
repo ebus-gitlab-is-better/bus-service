@@ -191,7 +191,7 @@ func (r *BusRouter) delete(c *gin.Context) {
 // @Produce	json
 // @Tags		bus
 // @Param		id	path	int	true	"Bus ID"	Format(uint64)
-// @Success	200 200	{object}	biz.Bus
+// @Success	200	{object}	biz.Bus
 // @Failure	401
 // @Failure	403
 // @Failure	500
@@ -227,7 +227,7 @@ type ListBuses struct {
 // @Accept		json
 // @Produce	json
 // @Tags		bus
-// @Success	200 200	{object}	route.ListBuses
+// @Success	200	{object}	route.ListBuses
 // @Failure	401
 // @Failure	403
 // @Failure	500

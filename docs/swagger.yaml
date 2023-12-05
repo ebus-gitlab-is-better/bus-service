@@ -1,5 +1,27 @@
 basePath: /
 definitions:
+  bus-service_internal_biz.Bus:
+    properties:
+      driver:
+        $ref: '#/definitions/bus-service_internal_biz.BusUser'
+      id:
+        type: integer
+      routeID:
+        type: integer
+    type: object
+  bus-service_internal_biz.BusUser:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      lastName:
+        type: string
+      username:
+        type: string
+    type: object
   bus-service_internal_biz.Route:
     properties:
       id:
@@ -34,17 +56,31 @@ definitions:
         type: string
       routeID:
         type: integer
+    required:
+    - driverID
+    - routeID
+    type: object
+  internal_route.ListBuses:
+    properties:
+      buses:
+        items:
+          $ref: '#/definitions/bus-service_internal_biz.Bus'
+        type: array
+      count:
+        type: integer
     type: object
   internal_route.RouteDTO:
     properties:
       number:
         type: string
-      path:
-        type: string
       stations:
+        description: Path     string
         items:
           $ref: '#/definitions/internal_route.StationDTO'
         type: array
+    required:
+    - number
+    - stations
     type: object
   internal_route.StationDTO:
     properties:
@@ -56,6 +92,10 @@ definitions:
         type: number
       name:
         type: string
+    required:
+    - lat
+    - lon
+    - name
     type: object
 host: bus.e-bus.site
 info:
@@ -77,7 +117,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: "200"
+            $ref: '#/definitions/internal_route.ListBuses'
         "400":
           description: Bad Request
         "401":
@@ -164,7 +204,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: "200"
+            $ref: '#/definitions/bus-service_internal_biz.Bus'
         "400":
           description: Bad Request
         "401":

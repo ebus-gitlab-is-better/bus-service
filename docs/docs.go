@@ -35,7 +35,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "200"
+                            "$ref": "#/definitions/internal_route.ListBuses"
                         }
                     },
                     "400": {
@@ -125,7 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "200"
+                            "$ref": "#/definitions/bus-service_internal_biz.Bus"
                         }
                     },
                     "400": {
@@ -461,6 +461,40 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "bus-service_internal_biz.Bus": {
+            "type": "object",
+            "properties": {
+                "driver": {
+                    "$ref": "#/definitions/bus-service_internal_biz.BusUser"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "routeID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "bus-service_internal_biz.BusUser": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "bus-service_internal_biz.Route": {
             "type": "object",
             "properties": {
@@ -506,6 +540,10 @@ const docTemplate = `{
         },
         "internal_route.BusDTO": {
             "type": "object",
+            "required": [
+                "driverID",
+                "routeID"
+            ],
             "properties": {
                 "driverID": {
                     "type": "string"
@@ -515,16 +553,32 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_route.ListBuses": {
+            "type": "object",
+            "properties": {
+                "buses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bus-service_internal_biz.Bus"
+                    }
+                },
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
         "internal_route.RouteDTO": {
             "type": "object",
+            "required": [
+                "number",
+                "stations"
+            ],
             "properties": {
                 "number": {
                     "type": "string"
                 },
-                "path": {
-                    "type": "string"
-                },
                 "stations": {
+                    "description": "Path     string",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/internal_route.StationDTO"
@@ -534,6 +588,11 @@ const docTemplate = `{
         },
         "internal_route.StationDTO": {
             "type": "object",
+            "required": [
+                "lat",
+                "lon",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "integer"
