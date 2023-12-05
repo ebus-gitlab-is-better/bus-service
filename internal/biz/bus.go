@@ -8,14 +8,19 @@ import (
 
 type Bus struct {
 	Id      uint32
-	RouteID uint32
+	RouteID *uint32
+	Route   *Route
 	Driver  BusUser
+	Number  string
+	Status  string
 }
 
 type BusDTO struct {
 	Id       uint32
-	RouteID  uint32
+	RouteID  *uint32
 	DriverID string
+	Number   string
+	Status   string
 }
 
 type BusUser struct {

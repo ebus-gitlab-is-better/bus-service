@@ -9,8 +9,11 @@ import (
 
 type Bus struct {
 	Id       uint32 `gorm:"primaryKey"`
-	RouteID  uint32
+	RouteID  *uint32
+	Route    *Route
 	DriverID string
+	Number   string
+	Status   string
 }
 
 type busRepo struct {
@@ -41,7 +44,7 @@ func (r *busRepo) Delete(ctx context.Context, id uint32) error {
 // GetById implements biz.BusRepo.
 func (r *busRepo) GetById(ctx context.Context, id uint32) (*biz.Bus, error) {
 	var busDB Bus
-	if err := r.data.db.Where(&Bus{Id: id}).Find(&busDB).Error; err != nil {
+	if err := r.data.db.Preload("Route").Where(&Bus{Id: id}).Find(&busDB).Error; err != nil {
 		return nil, err
 	}
 	return r.modelToResponse(busDB), nil
@@ -51,7 +54,7 @@ func (r *busRepo) GetById(ctx context.Context, id uint32) (*biz.Bus, error) {
 func (r *busRepo) List(ctx context.Context) ([]*biz.Bus, int64, error) {
 	var busDB []Bus
 	localDB := r.data.db.Model(&Bus{})
-	if err := localDB.Find(&busDB).Error; err != nil {
+	if err := localDB.Preload("Route").Find(&busDB).Error; err != nil {
 		return nil, 0, err
 	}
 	var count int64
@@ -77,8 +80,7 @@ func (r *busRepo) Update(ctx context.Context, bus *biz.BusDTO) error {
 
 func (r *busRepo) modelToResponse(b Bus) *biz.Bus {
 	user, _ := r.data.keycloak.GetUserByID(b.DriverID)
-	//ignore err
-	return &biz.Bus{
+	dto := &biz.Bus{
 		Id:      b.Id,
 		RouteID: b.RouteID,
 		Driver: biz.BusUser{
@@ -89,4 +91,9 @@ func (r *busRepo) modelToResponse(b Bus) *biz.Bus {
 			Id:        user.ID,
 		},
 	}
+	if b.Route != nil {
+		dto.Route = b.Route.modelToResponse()
+	}
+	//ignore err
+	return dto
 }

@@ -33,8 +33,10 @@ func (r *BusRouter) Register(router *gin.RouterGroup) {
 }
 
 type BusDTO struct {
-	RouteID  uint32 `validate:"required"`
-	DriverID string `validate:"required"`
+	RouteID  *uint32 `validate:"required"`
+	DriverID string  `validate:"required"`
+	Number   string  `validate:"required"`
+	Status   string  `validate:"required"`
 }
 
 // @Summary	Create bus
@@ -77,6 +79,8 @@ func (r *BusRouter) create(c *gin.Context) {
 	err = r.uc.Create(context.TODO(), &biz.BusDTO{
 		RouteID:  dto.RouteID,
 		DriverID: dto.DriverID,
+		Status:   "Не запущен",
+		Number:   dto.Number,
 	})
 
 	if err != nil {
@@ -140,6 +144,8 @@ func (r *BusRouter) update(c *gin.Context) {
 	err = r.uc.Update(context.TODO(), &biz.BusDTO{
 		RouteID:  dto.RouteID,
 		DriverID: dto.DriverID,
+		Status:   "Не запущен",
+		Number:   dto.Number,
 		Id:       uint32(idUint),
 	})
 

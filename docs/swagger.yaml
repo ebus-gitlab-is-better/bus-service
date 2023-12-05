@@ -6,8 +6,14 @@ definitions:
         $ref: '#/definitions/bus-service_internal_biz.BusUser'
       id:
         type: integer
+      number:
+        type: string
+      route:
+        $ref: '#/definitions/bus-service_internal_biz.Route'
       routeID:
         type: integer
+      status:
+        type: string
     type: object
   bus-service_internal_biz.BusUser:
     properties:
@@ -54,11 +60,17 @@ definitions:
     properties:
       driverID:
         type: string
+      number:
+        type: string
       routeID:
         type: integer
+      status:
+        type: string
     required:
     - driverID
+    - number
     - routeID
+    - status
     type: object
   internal_route.ListBuses:
     properties:

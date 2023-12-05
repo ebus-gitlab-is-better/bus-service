@@ -470,8 +470,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "number": {
+                    "type": "string"
+                },
+                "route": {
+                    "$ref": "#/definitions/bus-service_internal_biz.Route"
+                },
                 "routeID": {
                     "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -542,14 +551,22 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "driverID",
-                "routeID"
+                "number",
+                "routeID",
+                "status"
             ],
             "properties": {
                 "driverID": {
                     "type": "string"
                 },
+                "number": {
+                    "type": "string"
+                },
                 "routeID": {
                     "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
