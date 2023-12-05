@@ -60,7 +60,10 @@ func (api *KeycloakAPI) GetUserByID(userId string) (*gocloak.User, error) {
 }
 
 func (api *KeycloakAPI) GetDrivers(roleName string) ([]*gocloak.User, error) {
-	fmt.Println(api.clientId, api.clientSecret, api.realm, api.client)
+	fmt.Println(api.clientId)
+	fmt.Println(api.clientSecret)
+	fmt.Println(api.realm)
+	fmt.Println(api.client)
 	token, err := api.client.LoginClient(
 		context.TODO(),
 		api.clientId,
