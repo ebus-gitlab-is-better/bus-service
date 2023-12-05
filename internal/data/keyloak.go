@@ -50,3 +50,18 @@ func (api *KeycloakAPI) GetUserByID(userId string) (*gocloak.User, error) {
 		userId,
 	)
 }
+
+func (api *KeycloakAPI) GetDrivers(roleName string) ([]*gocloak.User, error) {
+	token, err := api.client.LoginAdmin(context.TODO(), api.conf.Keycloak.ClientId, api.conf.Keycloak.ClientSecret, api.conf.Keycloak.Realm)
+	if err != nil {
+		panic("Something wrong with the credentials or url")
+	}
+
+	return api.client.GetUsersByRoleName(
+		context.TODO(),
+		token.AccessToken,
+		api.conf.Keycloak.Realm,
+		roleName,
+		gocloak.GetUsersByRoleParams{},
+	)
+}

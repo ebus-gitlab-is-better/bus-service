@@ -28,6 +28,21 @@ definitions:
       username:
         type: string
     type: object
+  bus-service_internal_biz.Driver:
+    properties:
+      bus:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      number:
+        type: string
+      route:
+        type: string
+    type: object
   bus-service_internal_biz.Route:
     properties:
       id:
@@ -80,6 +95,13 @@ definitions:
         type: array
       count:
         type: integer
+    type: object
+  internal_route.ListDriverDTO:
+    properties:
+      drivers:
+        items:
+          $ref: '#/definitions/bus-service_internal_biz.Driver'
+        type: array
     type: object
   internal_route.RouteDTO:
     properties:
@@ -264,6 +286,30 @@ paths:
       summary: Update bus
       tags:
       - bus
+  /drivers/:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_route.ListDriverDTO'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get drivers
+      tags:
+      - drivers
   /route/:
     get:
       consumes:

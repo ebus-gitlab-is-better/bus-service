@@ -86,6 +86,7 @@ func NewHTTPServer(
 	bus *route.BusRouter,
 	keycloak *data.KeycloakAPI,
 	route *route.RouteRouter,
+	driver *route.DriverRoute,
 	logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
@@ -114,7 +115,9 @@ func NewHTTPServer(
 	bus.Register(busG)
 	routeG := r.Group("/route")
 	routeG.Use(AuthMiddleware(keycloak))
-	route.Register(routeG)
+	routeDriver := r.Group("/drivers")
+	routeDriver.Use(AuthMiddleware(keycloak))
+	driver.Register(routeDriver)
 	srv := http.NewServer(opts...)
 
 	srv.HandlePrefix("/", r)
