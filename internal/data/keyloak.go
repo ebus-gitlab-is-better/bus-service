@@ -14,8 +14,6 @@ type KeycloakAPI struct {
 	clientId     string
 	clientSecret string
 	realm        string
-	username     string
-	password     string
 }
 
 func NewKeyCloakAPI(conf *conf.Data, client *gocloak.GoCloak, logger log.Logger) *KeycloakAPI {
@@ -25,8 +23,6 @@ func NewKeyCloakAPI(conf *conf.Data, client *gocloak.GoCloak, logger log.Logger)
 		clientId:     conf.Keycloak.ClientId,
 		clientSecret: conf.Keycloak.ClientSecret,
 		realm:        conf.Keycloak.Realm,
-		username:     conf.Keycloak.Username,
-		password:     conf.Keycloak.Password,
 	}
 }
 
@@ -63,10 +59,10 @@ func (api *KeycloakAPI) GetUserByID(userId string) (*gocloak.User, error) {
 }
 
 func (api *KeycloakAPI) GetDrivers(roleName string) ([]*gocloak.User, error) {
-	token, err := api.client.LoginAdmin(
+	token, err := api.client.LoginClient(
 		context.TODO(),
-		api.username,
-		api.password,
+		api.clientId,
+		api.clientSecret,
 		api.realm)
 	if err != nil {
 		return nil, err
