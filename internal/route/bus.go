@@ -8,15 +8,19 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type BusRouter struct {
 	uc *biz.BusUseCase
+	v  *validator.Validate
 }
 
 func NewBusRouter(uc *biz.BusUseCase) *BusRouter {
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	return &BusRouter{
 		uc: uc,
+		v:  validate,
 	}
 }
 
@@ -29,8 +33,8 @@ func (r *BusRouter) Register(router *gin.RouterGroup) {
 }
 
 type BusDTO struct {
-	RouteID  uint32
-	DriverID string
+	RouteID  uint32 `validate:"required"`
+	DriverID string `validate:"required"`
 }
 
 // @Summary	Create bus
@@ -57,6 +61,13 @@ func (r *BusRouter) create(c *gin.Context) {
 	dto := BusDTO{}
 
 	err = json.Unmarshal(body, &dto)
+	if err != nil {
+		c.AbortWithStatusJSON(400, &gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = r.v.Struct(dto)
 	if err != nil {
 		c.AbortWithStatusJSON(400, &gin.H{
 			"error": err.Error(),
@@ -113,6 +124,13 @@ func (r *BusRouter) update(c *gin.Context) {
 	dto := BusDTO{}
 
 	err = json.Unmarshal(body, &dto)
+	if err != nil {
+		c.AbortWithStatusJSON(400, &gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = r.v.Struct(dto)
 	if err != nil {
 		c.AbortWithStatusJSON(400, &gin.H{
 			"error": err.Error(),

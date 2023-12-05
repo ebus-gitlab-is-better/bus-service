@@ -1,24 +1,26 @@
 package route
 
 import (
+	mapS "bus-service/api/map/v1"
 	"bus-service/internal/biz"
 	"context"
 	"encoding/json"
 	"io"
 	"strconv"
 
-	mapS "bus-service/api/map/v1"
-
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type RouteRouter struct {
 	uc        *biz.RouteUseCase
 	mapClient mapS.MapClient
+	v         *validator.Validate
 }
 
 func NewRouteRouter(uc *biz.RouteUseCase, mapClient mapS.MapClient) *RouteRouter {
-	return &RouteRouter{uc: uc, mapClient: mapClient}
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	return &RouteRouter{uc: uc, mapClient: mapClient, v: validate}
 }
 
 func (r *RouteRouter) Register(router *gin.RouterGroup) {
@@ -31,15 +33,15 @@ func (r *RouteRouter) Register(router *gin.RouterGroup) {
 
 type StationDTO struct {
 	ID   uint32
-	Name string
-	Lat  float64
-	Lon  float64
+	Name string  `validate:"required"`
+	Lat  float64 `validate:"required"`
+	Lon  float64 `validate:"required"`
 }
 
 type RouteDTO struct {
-	Number string
+	Number string `validate:"required"`
 	// Path     string
-	Stations []StationDTO
+	Stations []StationDTO `validate:"required"`
 }
 
 // @Summary	Create route
@@ -66,6 +68,13 @@ func (r *RouteRouter) create(c *gin.Context) {
 	dto := RouteDTO{}
 
 	err = json.Unmarshal(body, &dto)
+	if err != nil {
+		c.AbortWithStatusJSON(400, &gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = r.v.Struct(dto)
 	if err != nil {
 		c.AbortWithStatusJSON(400, &gin.H{
 			"error": err.Error(),
@@ -147,6 +156,13 @@ func (r *RouteRouter) update(c *gin.Context) {
 	dto := RouteDTO{}
 
 	err = json.Unmarshal(body, &dto)
+	if err != nil {
+		c.AbortWithStatusJSON(400, &gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = r.v.Struct(dto)
 	if err != nil {
 		c.AbortWithStatusJSON(400, &gin.H{
 			"error": err.Error(),
