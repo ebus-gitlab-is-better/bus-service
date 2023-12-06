@@ -36,7 +36,9 @@ func (r *driverRepo) GetDrivers(ctx context.Context) ([]*biz.Driver, error) {
 	mapBus := map[string][]int{}
 	buses, err := r.ListIn(ctx, ids)
 	for i, r := range buses {
-		mapBus[r.DriverID] = append(mapBus[r.DriverID], i)
+		if r.DriverID != nil {
+			mapBus[*r.DriverID] = append(mapBus[*r.DriverID], i)
+		}
 	}
 	for _, user := range kusers {
 		dto := &biz.Driver{

@@ -18,7 +18,7 @@ type Bus struct {
 type BusDTO struct {
 	Id       uint32
 	RouteID  *uint32
-	DriverID string
+	DriverID *string
 	Number   string
 	Status   string
 }
@@ -37,6 +37,7 @@ type BusRepo interface {
 	GetById(context.Context, uint32) (*Bus, error)
 	List(context.Context) ([]*Bus, int64, error)
 	Delete(context.Context, uint32) error
+	GetActiveBus(context.Context) ([]*Bus, error)
 }
 
 type BusUseCase struct {

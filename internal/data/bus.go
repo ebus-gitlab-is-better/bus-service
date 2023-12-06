@@ -8,17 +8,34 @@ import (
 )
 
 type Bus struct {
-	Id       uint32 `gorm:"primaryKey"`
-	RouteID  *uint32
-	Route    *Route
-	DriverID string
-	Number   string
-	Status   string
+	Id           uint32 `gorm:"primaryKey"`
+	RouteID      *uint32
+	Route        *Route
+	DriverID     *string
+	Number       string
+	Status       string
+	BatteryLevel uint
 }
 
 type busRepo struct {
 	data   *Data
 	logger *log.Helper
+}
+
+// GetActiveBus implements biz.BusRepo.
+func (r *busRepo) GetActiveBus(context.Context) ([]*biz.Bus, error) {
+	var busDB []Bus
+	localDB := r.data.db.Model(&Bus{})
+	if err := localDB.Preload("Route").Where("driver_id IS NOT NULL").Find(&busDB).Error; err != nil {
+		return nil, err
+	}
+	var count int64
+	localDB.Count(&count)
+	bus := make([]*biz.Bus, 0)
+	for _, b := range busDB {
+		bus = append(bus, r.modelToResponse(b))
+	}
+	return bus, nil
 }
 
 func NewBusRepo(data *Data, logger log.Logger) biz.BusRepo {
@@ -79,17 +96,19 @@ func (r *busRepo) Update(ctx context.Context, bus *biz.BusDTO) error {
 }
 
 func (r *busRepo) modelToResponse(b Bus) *biz.Bus {
-	user, _ := r.data.keycloak.GetUserByID(b.DriverID)
 	dto := &biz.Bus{
 		Id:      b.Id,
 		RouteID: b.RouteID,
-		Driver: biz.BusUser{
+	}
+	if b.DriverID != nil {
+		user, _ := r.data.keycloak.GetUserByID(*b.DriverID)
+		dto.Driver = biz.BusUser{
 			Username:  user.Username,
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
 			Email:     user.Email,
 			Id:        user.ID,
-		},
+		}
 	}
 	if b.Route != nil {
 		dto.Route = b.Route.modelToResponse()

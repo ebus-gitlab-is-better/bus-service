@@ -34,9 +34,9 @@ func (r *BusRouter) Register(router *gin.RouterGroup) {
 
 type BusDTO struct {
 	RouteID  *uint32 `validate:"required"`
-	DriverID string  `validate:"required"`
-	Number   string  `validate:"required"`
-	Status   string  `validate:"required"`
+	DriverID *string
+	Number   string `validate:"required"`
+	Status   string `validate:"required"`
 }
 
 // @Summary	Create bus
