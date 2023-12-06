@@ -26,7 +26,7 @@ func NewRouteRouter(uc *biz.RouteUseCase, mapClient mapS.MapClient) *RouteRouter
 func (r *RouteRouter) Register(router *gin.RouterGroup) {
 	router.POST("/", r.create)
 	router.GET("/:id", r.getById)
-	router.PUT("/:id", r.update)
+	// router.PUT("/:id", r.update)
 	router.DELETE("/:id", r.delete)
 	router.GET("/", r.list)
 }
@@ -111,6 +111,7 @@ func (r *RouteRouter) create(c *gin.Context) {
 		Time:     req.Time,
 		Stations: stations,
 		Lengths:  req.Lengths,
+		Length:   req.Length,
 	})
 
 	if err != nil {
@@ -136,82 +137,82 @@ func (r *RouteRouter) create(c *gin.Context) {
 // @Failure	400
 // @Failure	404
 // @Router		/route/{id} [put]
-func (r *RouteRouter) update(c *gin.Context) {
-	id := c.Param("id")
-	idUint, err := strconv.Atoi(id)
+// func (r *RouteRouter) update(c *gin.Context) {
+// 	id := c.Param("id")
+// 	idUint, err := strconv.Atoi(id)
 
-	if err != nil {
-		c.AbortWithStatusJSON(400, gin.H{
-			"error": "parse id error",
-		})
-		return
-	}
+// 	if err != nil {
+// 		c.AbortWithStatusJSON(400, gin.H{
+// 			"error": "parse id error",
+// 		})
+// 		return
+// 	}
 
-	body, err := io.ReadAll(c.Request.Body)
+// 	body, err := io.ReadAll(c.Request.Body)
 
-	if err != nil {
-		c.JSON(400, &gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	dto := RouteDTO{}
+// 	if err != nil {
+// 		c.JSON(400, &gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	dto := RouteDTO{}
 
-	err = json.Unmarshal(body, &dto)
-	if err != nil {
-		c.AbortWithStatusJSON(400, &gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	err = r.v.Struct(dto)
-	if err != nil {
-		c.AbortWithStatusJSON(400, &gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	stations := make([]biz.Stations, 0)
-	for _, station := range dto.Stations {
-		stations = append(stations, biz.Stations{
-			ID:   uint(station.ID),
-			Lat:  station.Lat,
-			Name: station.Name,
-			Lon:  station.Lon,
-		})
-	}
-	points := make([]*mapS.Point, 0)
-	for _, station := range stations {
-		points = append(points, &mapS.Point{
-			Lat: float32(station.Lat),
-			Lon: float32(station.Lon),
-		})
-	}
-	req, err := r.mapClient.GetPath(context.TODO(), &mapS.GetPathRequest{
-		Points: points,
-	})
-	if err != nil {
-		c.AbortWithStatusJSON(400, &gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	err = r.uc.Update(context.TODO(), &biz.Route{
-		Id:       uint32(idUint),
-		Number:   dto.Number,
-		Path:     req.Shape,
-		Stations: stations,
-	})
+// 	err = json.Unmarshal(body, &dto)
+// 	if err != nil {
+// 		c.AbortWithStatusJSON(400, &gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	err = r.v.Struct(dto)
+// 	if err != nil {
+// 		c.AbortWithStatusJSON(400, &gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	stations := make([]biz.Stations, 0)
+// 	for _, station := range dto.Stations {
+// 		stations = append(stations, biz.Stations{
+// 			ID:   uint(station.ID),
+// 			Lat:  station.Lat,
+// 			Name: station.Name,
+// 			Lon:  station.Lon,
+// 		})
+// 	}
+// 	points := make([]*mapS.Point, 0)
+// 	for _, station := range stations {
+// 		points = append(points, &mapS.Point{
+// 			Lat: float32(station.Lat),
+// 			Lon: float32(station.Lon),
+// 		})
+// 	}
+// 	req, err := r.mapClient.GetPath(context.TODO(), &mapS.GetPathRequest{
+// 		Points: points,
+// 	})
+// 	if err != nil {
+// 		c.AbortWithStatusJSON(400, &gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	err = r.uc.Update(context.TODO(), &biz.Route{
+// 		Id:       uint32(idUint),
+// 		Number:   dto.Number,
+// 		Path:     req.Shape,
+// 		Stations: stations,
+// 	})
 
-	if err != nil {
-		c.AbortWithStatusJSON(400, &gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+// 	if err != nil {
+// 		c.AbortWithStatusJSON(400, &gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
 
-	c.Status(200)
-}
+// 	c.Status(200)
+// }
 
 // @Summary	Delete route
 // @Accept		json

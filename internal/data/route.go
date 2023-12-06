@@ -15,6 +15,7 @@ type Route struct {
 	Time     pq.Float32Array `gorm:"type:double precision[]"`
 	Lengths  pq.Float32Array `gorm:"type:double precision[]"`
 	Stations []Stations      `gorm:"many2many:route_stations;"`
+	Length   float32
 }
 
 func (m Route) modelToResponseWithoutStations() *biz.Route {
@@ -24,6 +25,7 @@ func (m Route) modelToResponseWithoutStations() *biz.Route {
 		Path:    m.Path,
 		Time:    m.Time,
 		Lengths: m.Lengths,
+		Length:  m.Length,
 	}
 }
 
@@ -39,6 +41,7 @@ func (m Route) modelToResponse() *biz.Route {
 		Stations: stations,
 		Time:     m.Time,
 		Lengths:  m.Lengths,
+		Length:   m.Length,
 	}
 }
 
@@ -66,6 +69,7 @@ func (r *routeRepo) Create(ctx context.Context, route *biz.Route) error {
 			Lon:  station.Lon,
 		})
 	}
+	routeDB.Length = route.Length
 	routeDB.Stations = stations
 	if err := r.data.db.Create(&routeDB).Error; err != nil {
 		return err
@@ -109,6 +113,9 @@ func (r *routeRepo) Update(ctx context.Context, route *biz.Route) error {
 	routeDB.Id = route.Id
 	routeDB.Number = route.Number
 	routeDB.Path = route.Path
+	routeDB.Length = route.Length
+	routeDB.Lengths = route.Lengths
+	routeDB.Time = route.Time
 	stations := make([]Stations, 0)
 	for _, station := range route.Stations {
 		stations = append(stations, Stations{

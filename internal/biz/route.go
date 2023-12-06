@@ -18,6 +18,7 @@ type Route struct {
 	Time     []float32
 	Lengths  []float32
 	Stations []Stations
+	Length   float32
 }
 
 type Accident struct {
