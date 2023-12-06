@@ -3,6 +3,7 @@ package data
 import (
 	"bus-service/internal/biz"
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/log"
 	pq "github.com/lib/pq"
@@ -104,6 +105,7 @@ func (r *routeRepo) List(context.Context) ([]*biz.Route, int64, error) {
 	for _, b := range routeDB {
 		route = append(route, b.modelToResponse())
 	}
+	fmt.Println(route[0].Stations)
 	return route, count, nil
 }
 
