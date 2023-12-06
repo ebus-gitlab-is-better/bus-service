@@ -95,7 +95,7 @@ func (r *routeRepo) GetById(ctx context.Context, id uint32) (*biz.Route, error) 
 func (r *routeRepo) List(context.Context) ([]*biz.Route, int64, error) {
 	var routeDB []Route
 	localDB := r.data.db.Model(&Route{})
-	if err := localDB.Find(&routeDB).Error; err != nil {
+	if err := localDB.Preload("Stations").Find(&routeDB).Error; err != nil {
 		return nil, 0, err
 	}
 	var count int64
