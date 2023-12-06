@@ -43,7 +43,8 @@ func NewCustomHttp(
 	config.AllowCredentials = true
 	r.Use(cors.New(config))
 	srv := http.NewServer(opts...)
-
+	routeG := r.Group("/route")
+	route.Register(routeG)
 	srv.HandlePrefix("/", r)
 	return &customhttp.CustomHTTP{Http: srv}
 }

@@ -20,5 +20,6 @@ WORKDIR /app
 
 EXPOSE 8000
 EXPOSE 9000
+EXPOSE 8080
 
 CMD ["./bus-service", "-conf", "config.yaml"]
