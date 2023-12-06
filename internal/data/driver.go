@@ -67,7 +67,7 @@ func (r *driverRepo) GetDrivers(ctx context.Context) ([]*biz.Driver, error) {
 func (r *driverRepo) ListIn(ctx context.Context, ids []string) ([]Bus, error) {
 	var busDB []Bus
 	localDB := r.data.db.Model(&Bus{})
-	if err := localDB.Where("driver_id IN ?", ids).Find(&busDB).Error; err != nil {
+	if err := localDB.Preload("Route").Where("driver_id IN ?", ids).Find(&busDB).Error; err != nil {
 		return nil, err
 	}
 	return busDB, nil

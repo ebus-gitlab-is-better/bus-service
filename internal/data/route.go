@@ -5,15 +5,16 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
+	pq "github.com/lib/pq"
 )
 
 type Route struct {
 	Id       uint32 `gorm:"primaryKey"`
 	Number   string
 	Path     string
-	Time     []float32
-	Lengths  []float32
-	Stations []Stations `gorm:"many2many:route_stations;"`
+	Time     pq.Float32Array `gorm:"type:double precision[]"`
+	Lengths  pq.Float32Array `gorm:"type:double precision[]"`
+	Stations []Stations      `gorm:"many2many:route_stations;"`
 }
 
 func (m Route) modelToResponseWithoutStations() *biz.Route {
