@@ -11,6 +11,7 @@ type Route struct {
 	Id       uint32 `gorm:"primaryKey"`
 	Number   string
 	Path     string
+	Time     []float32
 	Stations []Stations `gorm:"many2many:route_stations;"`
 }
 
@@ -19,6 +20,7 @@ func (m Route) modelToResponseWithoutStations() *biz.Route {
 		Id:     m.Id,
 		Number: m.Number,
 		Path:   m.Path,
+		Time:   m.Time,
 	}
 }
 
@@ -32,6 +34,7 @@ func (m Route) modelToResponse() *biz.Route {
 		Number:   m.Number,
 		Path:     m.Path,
 		Stations: stations,
+		Time:     m.Time,
 	}
 }
 

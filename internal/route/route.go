@@ -108,6 +108,7 @@ func (r *RouteRouter) create(c *gin.Context) {
 	err = r.uc.Create(context.TODO(), &biz.Route{
 		Number:   dto.Number,
 		Path:     req.Shape,
+		Time:     req.Time,
 		Stations: stations,
 	})
 

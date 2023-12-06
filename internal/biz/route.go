@@ -15,6 +15,7 @@ type Route struct {
 	Id       uint32
 	Number   string
 	Path     string
+	Time     []float32
 	Stations []Stations
 }
 
