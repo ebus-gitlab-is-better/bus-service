@@ -12,15 +12,17 @@ type Route struct {
 	Number   string
 	Path     string
 	Time     []float32
+	Lengths  []float32
 	Stations []Stations `gorm:"many2many:route_stations;"`
 }
 
 func (m Route) modelToResponseWithoutStations() *biz.Route {
 	return &biz.Route{
-		Id:     m.Id,
-		Number: m.Number,
-		Path:   m.Path,
-		Time:   m.Time,
+		Id:      m.Id,
+		Number:  m.Number,
+		Path:    m.Path,
+		Time:    m.Time,
+		Lengths: m.Lengths,
 	}
 }
 
@@ -35,6 +37,7 @@ func (m Route) modelToResponse() *biz.Route {
 		Path:     m.Path,
 		Stations: stations,
 		Time:     m.Time,
+		Lengths:  m.Lengths,
 	}
 }
 
@@ -52,6 +55,8 @@ func (r *routeRepo) Create(ctx context.Context, route *biz.Route) error {
 	var routeDB Route
 	routeDB.Number = route.Number
 	routeDB.Path = route.Path
+	routeDB.Time = route.Time
+	routeDB.Lengths = route.Lengths
 	stations := make([]Stations, 0)
 	for _, station := range route.Stations {
 		stations = append(stations, Stations{

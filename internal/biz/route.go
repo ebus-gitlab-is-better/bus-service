@@ -16,6 +16,7 @@ type Route struct {
 	Number   string
 	Path     string
 	Time     []float32
+	Lengths  []float32
 	Stations []Stations
 }
 

@@ -110,6 +110,7 @@ func (r *RouteRouter) create(c *gin.Context) {
 		Path:     req.Shape,
 		Time:     req.Time,
 		Stations: stations,
+		Lengths:  req.Lengths,
 	})
 
 	if err != nil {

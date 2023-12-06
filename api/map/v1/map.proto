@@ -23,6 +23,7 @@ message GetPathRequest {
 message PathResponse {
 	string shape = 1;
 	repeated float time = 2; 
+	repeated float lengths = 3;
 }
 
 message CheckPathRequest {
