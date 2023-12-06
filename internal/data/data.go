@@ -36,6 +36,7 @@ var ProviderSet = wire.NewSet(
 	NewMapService,
 	NewRabbit,
 	NewDriverRepo,
+	NewShiftRepo,
 )
 
 // Data структура для работы с базой данных

@@ -8,7 +8,7 @@ import (
 )
 
 // ProviderSet is biz providers.
-var ProviderSet = wire.NewSet(NewBusUseCase, NewRouteUseCase, NewDriverUseCase)
+var ProviderSet = wire.NewSet(NewBusUseCase, NewRouteUseCase, NewDriverUseCase, NewShiftUseCase)
 
 type Transaction interface {
 	ExecTx(context.Context, func(ctx context.Context) error) error

@@ -45,7 +45,7 @@ func (r *shiftRepo) Create(ctx context.Context, shift *biz.Shift) error {
 // GetById implements biz.ShiftRepo.
 func (r *shiftRepo) GetByDriverID(ctx context.Context, driverId string) (*biz.Shift, error) {
 	var shiftDB Shift
-	if err := r.data.db.Where(&Shift{DriverID: driverId}).Find(&shiftDB).Error; err != nil {
+	if err := r.data.db.Where(&Shift{DriverID: driverId, EndDate: nil}).Order("start_time DESC").First(&shiftDB).Error; err != nil {
 		return nil, err
 	}
 	return shiftDB.modelToResponse(), nil

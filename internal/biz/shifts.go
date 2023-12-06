@@ -2,7 +2,10 @@ package biz
 
 import (
 	"context"
+	"errors"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Shift struct {
@@ -27,6 +30,14 @@ func NewShiftUseCase(repo ShiftRepo) *ShiftUseCase {
 }
 
 func (uc *ShiftUseCase) Create(ctx context.Context, shift *Shift) error {
+	if data, err := uc.repo.GetByDriverID(ctx, shift.DriverID); data != nil || err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		if data != nil {
+			return errors.New("DRIVER_IN_DRIVE")
+		}
+	}
 	return uc.repo.Create(ctx, shift)
 }
 

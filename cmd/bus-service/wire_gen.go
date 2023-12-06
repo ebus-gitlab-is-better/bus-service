@@ -34,7 +34,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	}
 	busRepo := data.NewBusRepo(dataData, logger)
 	busUseCase := biz.NewBusUseCase(busRepo, logger)
-	busRouter := route.NewBusRouter(busUseCase)
+	shiftRepo := data.NewShiftRepo(dataData)
+	shiftUseCase := biz.NewShiftUseCase(shiftRepo)
+	busRouter := route.NewBusRouter(busUseCase, shiftUseCase)
 	routeRepo := data.NewRouterRepo(dataData, logger)
 	mapClient := data.NewMapService(confData)
 	rabbitData := data.NewRabbit(confData)
