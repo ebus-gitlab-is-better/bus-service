@@ -45,7 +45,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	driverRoute := route.NewDriverRoute(driverUseCase)
 	httpServer := server.NewHTTPServer(confServer, busRouter, keycloakAPI, routeRouter, driverRoute, logger)
 	rabbitConn := server.NewRabbitConn(rabbitData, routeUseCase)
-	app := newApp(logger, grpcServer, httpServer, rabbitConn)
+	customHTTP := server.NewCustomHttp(confServer, busRouter, keycloakAPI, routeRouter, driverRoute, logger)
+	app := newApp(logger, grpcServer, httpServer, rabbitConn, customHTTP)
 	return app, func() {
 		cleanup()
 	}, nil
