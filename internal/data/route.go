@@ -86,7 +86,7 @@ func (r *routeRepo) Delete(ctx context.Context, id uint32) error {
 // GetById implements biz.RouteRepo.
 func (r *routeRepo) GetById(ctx context.Context, id uint32) (*biz.Route, error) {
 	var routeDB Route
-	if err := r.data.db.Where(&Route{Id: id}).Find(&routeDB).Error; err != nil {
+	if err := r.data.db.Preload("Stations").Where(&Route{Id: id}).Find(&routeDB).Error; err != nil {
 		return nil, err
 	}
 	return routeDB.modelToResponse(), nil
